@@ -7,19 +7,21 @@
         </tr>
       </thead>
       <tbody>
-        <tr :key="employee.id" v-for="employee in employees">
-          <td v-if="employee.team === 'PatientPop'">{{employee.name}}</td>
-        </tr>
-        <tr v-if="adding">
-          <select v-model="employee" @change="addMember(employee)">
-            <option v-for="employee in employees" v-bind:key="employee">{{ employee.name }}</option>
-          </select>
-        </tr>
-        <tr v-else>
-          <button @click="addMode()">Add Team Member</button>
+        <tr :key="employee.id" v-for="employee in patientPopMembers">
+          <td>{{employee.name}}</td>
         </tr>
       </tbody>
     </table>
+    <div>
+      <select v-model="newMember">
+        <option
+          v-for="employee in notPatientPopMembers"
+          v-bind:key="employee.id"
+          v-bind:value="employee"
+        >{{ employee.name }}</option>
+      </select>
+      <button @click="addMember(newMember)">Add Member</button>
+    </div>
   </div>
 </template>
 
@@ -29,23 +31,28 @@ export default {
   props: {
     employees: Array
   },
+  computed: {
+    patientPopMembers: function() {
+      return this.employees.filter(function(u) {
+        return u.team === "PatientPop";
+      });
+    },
+    notPatientPopMembers: function() {
+      return this.employees.filter(function(u) {
+        return u.team !== "PatientPop";
+      });
+    }
+  },
   data() {
     return {
       adding: false
     };
   },
   methods: {
-    addMode() {
-      this.adding = true;
-    },
     addMember(employee) {
-        console.log(employee);
-      if (this.member === "") {
-          console.log("canceled");
-          return;
-      }
-      this.$emit("edit:employee", employee.id, employee);
-      this.adding = null;
+      employee.team = "PatientPop";
+      this.$emit("add:employee", employee.id, employee);
+      this.adding = false;
     }
   }
 };

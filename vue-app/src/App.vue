@@ -8,7 +8,7 @@
       @edit:employee="editEmployee"
     />
     <h1>PatientPop Roster</h1>
-    <team-editor :employees="employees"/>
+    <team-editor :employees="employees" @add:employee="editEmployee"/>
   </div>
 </template>
 
