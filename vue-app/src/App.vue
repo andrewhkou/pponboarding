@@ -8,14 +8,14 @@
       @edit:employee="editEmployee"
     />
     <h1>PatientPop Roster</h1>
-    <team-editor :employees="employees" @add:employee="editEmployee"/>
+    <team-editor :employees="employees" @add:employee="editEmployee" />
   </div>
 </template>
 
 <script>
 import EmployeeTable from "@/components/EmployeeTable.vue";
 import EmployeeForm from "@/components/EmployeeForm.vue";
-import TeamEditor from "@/components/TeamEditor.vue"
+import TeamEditor from "@/components/TeamEditor.vue";
 
 export default {
   name: "app",
@@ -32,21 +32,21 @@ export default {
           name: "Parth Shah",
           email: "partyshah@lambdaschool.com",
           year: "Freshman",
-          team: "PatientPop",
+          team: "PatientPop"
         },
         {
           id: 2,
           name: "Selina Feng",
           email: "selinafeng@berkeley.edu",
           year: "Junior",
-          team: "",
+          team: ""
         },
         {
           id: 3,
           name: "Michael Chen",
           email: "michaelchen@berkeley.edu",
           year: "Sophomore",
-          team: "",
+          team: ""
         }
       ]
     };
@@ -62,10 +62,20 @@ export default {
 
       this.employees = [...this.employees, newEmployee];
     },
-    editEmployee(id, updatedEmployee) {
+    async editEmployee(id, updatedEmployee) {
       this.employees = this.employees.map(employee =>
         employee.id === id ? updatedEmployee : employee
       );
+    },
+    async deleteEmployee(id) {
+      try {
+        await fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
+          method: "DELETE"
+        });
+        this.employees = this.employees.filter(employee => employee.id !== id);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 };

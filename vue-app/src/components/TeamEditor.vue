@@ -9,6 +9,7 @@
       <tbody>
         <tr :key="employee.id" v-for="employee in patientPopMembers">
           <td>{{employee.name}}</td>
+              <button @click="removeMember(employee)">Remove Member</button>
         </tr>
       </tbody>
     </table>
@@ -53,6 +54,11 @@ export default {
       employee.team = "PatientPop";
       this.$emit("add:employee", employee.id, employee);
       this.adding = false;
+    },
+    removeMember(employee) {
+        employee.team = "";
+        this.$emit("add:employee", employee.id, employee);
+        this.adding = false;
     }
   }
 };
