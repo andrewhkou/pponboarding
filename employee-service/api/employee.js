@@ -18,7 +18,8 @@ module.exports.add = (event, context, callback) => {
       callback(null, {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          'Access-Control-Allow-Credentials': true,
         },
         body: JSON.stringify({
           message: `Sucessfully submitted employee with name ${name} and email ${email}`,
@@ -31,7 +32,8 @@ module.exports.add = (event, context, callback) => {
       callback(null, {
         statusCode: 500,
         headers: {
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          'Access-Control-Allow-Credentials': true,
         },
         body: JSON.stringify({
           message: `Unable to submit employee with name ${name} and email ${email}`,
@@ -56,7 +58,8 @@ module.exports.list = (event, context, callback) => {
       return callback(null, {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          'Access-Control-Allow-Credentials': true,
         },
         body: JSON.stringify({
           employees: data.Items
@@ -84,7 +87,8 @@ module.exports.delete = (event, context, callback) => {
       return callback(null, {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          'Access-Control-Allow-Credentials': true,
         }
       });
     }
