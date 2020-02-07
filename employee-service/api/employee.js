@@ -8,7 +8,8 @@ module.exports.add = (event, context, callback) => {
   const requestBody = JSON.parse(event.body);
   const name = requestBody.name;
   const email = requestBody.email;
-  if (typeof name !== 'string' || typeof email !== 'string') {
+  const year = requestBody.year;
+  if (typeof name !== 'string' || typeof email !== 'string' || typeof year !== 'string') {
     console.error('Validation Failed');
     callback(new Error('Couldn\'t submit employee because of validation errors.'));
     return;
@@ -45,8 +46,8 @@ module.exports.add = (event, context, callback) => {
 module.exports.list = (event, context, callback) => {
   var params = {
     TableName: process.env.EMPLOYEE_TABLE,
-    ExpressionAttributeNames: { "#n": "name" },
-    ProjectionExpression: "id, #n, email"
+    ExpressionAttributeNames: { "#n": "name", "#y": "year" },
+    ProjectionExpression: "id, #n, email, #y"
   };
   console.log("Scanning Employee table.");
   const onScan = (err, data) => {
@@ -114,12 +115,13 @@ const submitEmployeeP = employee => {
     .then(res => employee);
 };
 // structures name and email into JSON, and adds some timestamp metadata
-const employeeInfo = (name, email) => {
+const employeeInfo = (name, email, year) => {
   const timestamp = new Date().getTime();
   return {
     id: uuid.v1(),
     name: name,
     email: email,
+    year: year,
     submittedAt: timestamp,
     updatedAt: timestamp,
   };
