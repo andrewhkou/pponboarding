@@ -26,50 +26,50 @@ export default {
   },
   data() {
     return {
-      employees: [
-        {
-          id: 1,
-          name: "Parth Shah",
-          email: "partyshah@lambdaschool.com",
-          year: "Freshman",
-          team: "PatientPop"
-        },
-        {
-          id: 2,
-          name: "Selina Feng",
-          email: "selinafeng@berkeley.edu",
-          year: "Junior",
-          team: ""
-        },
-        {
-          id: 3,
-          name: "Michael Chen",
-          email: "michaelchen@berkeley.edu",
-          year: "Sophomore",
-          team: ""
-        }
-      ]
+      employees: []
     };
   },
+  mounted() {
+    this.getEmployees();
+  },
   methods: {
-    addEmployee(employee) {
-      const lastId =
-        this.employees.length > 0
-          ? this.employees[this.employees.length - 1].id
-          : 0;
-      const id = lastId + 1;
-      const newEmployee = { ...employee, id };
-
-      this.employees = [...this.employees, newEmployee];
+    async addEmployee(employee) {
+      try {
+        const response = await fetch(
+          "https://xh387a68z1.execute-api.us-east-1.amazonaws.com/dev/employee",
+          {
+            method: "POST",
+            body: JSON.stringify(employee)
+          }
+        );
+        const data = await response.json();
+        const newEmployee = { ...employee, id: data["employeeId"] };
+        this.employees = [...this.employees, newEmployee];
+        console.log(this.employees);
+      } catch (error) {
+        console.error(error);
+      }
     },
     async editEmployee(id, updatedEmployee) {
       this.employees = this.employees.map(employee =>
         employee.id === id ? updatedEmployee : employee
       );
     },
+    async getEmployees() {
+      try {
+        const response = await fetch(
+          "https://xh387a68z1.execute-api.us-east-1.amazonaws.com/dev/employee"
+        );
+        const data = await response.json();
+        this.employees = data["employees"];
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async deleteEmployee(id) {
       try {
-        await fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
+        await fetch(`https://xh387a68z1.execute-api.us-east-1.amazonaws.com/dev/employee/${id}`, {
           method: "DELETE"
         });
         this.employees = this.employees.filter(employee => employee.id !== id);
