@@ -9,12 +9,13 @@ module.exports.add = (event, context, callback) => {
   const name = requestBody.name;
   const email = requestBody.email;
   const year = requestBody.year;
+  const team = "None";
   if (typeof name !== 'string' || typeof email !== 'string' || typeof year !== 'string') {
     console.error('Validation Failed');
     callback(new Error('Couldn\'t submit employee because of validation errors.'));
     return;
   }
-  submitEmployeeP(employeeInfo(name, email))
+  submitEmployeeP(employeeInfo(name, email, year, team))
     .then(res => {
       callback(null, {
         statusCode: 200,
@@ -47,7 +48,7 @@ module.exports.list = (event, context, callback) => {
   var params = {
     TableName: process.env.EMPLOYEE_TABLE,
     ExpressionAttributeNames: { "#n": "name", "#y": "year" },
-    ProjectionExpression: "id, #n, email, #y"
+    ProjectionExpression: "id, #n, email, #y, team"
   };
   console.log("Scanning Employee table.");
   const onScan = (err, data) => {
@@ -104,6 +105,77 @@ module.exports.delete = (event, context, callback) => {
   });
 };
 
+module.exports.edit = (event, context, callback) => {
+  const requestBody = JSON.parse(event.body);
+  const name = requestBody.name;
+  const email = requestBody.email;
+  const year = requestBody.year;
+  const team = requestBody.team;
+  submitEmployeeP(employeeInfo(name, email, year, team))
+    .then(res => {
+      callback(null, {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify({
+          message: `Sucessfully submitted employee with name ${name} and email ${email}`,
+          employeeId: res.id
+        })
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      callback(null, {
+        statusCode: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify({
+          message: `Unable to submit employee with name ${name} and email ${email}`,
+        })
+      })
+    });
+  // const params = {
+  //   TableName: process.env.EMPLOYEE_TABLE,
+  //   Key: {
+  //     id: event.pathParameters.id
+  //   },
+  //   UpdateExpression: "set name = :n, email = :e, year = :y, team = :t, ",
+  //   ExpressionAttributeValues:{
+  //       ":n": name,
+  //       ":e": email,
+  //       ":y": year,
+  //       ":t": team
+  //   },
+  // };
+  // const onEdit = (err, data) => {
+  //   if (err) {
+  //     console.error("Unable to edit employee. Error JSON:", JSON.stringify(err, null, 2));
+  //     callback(err);
+  //   } else {
+  //     console.log("Edit succeeded.");
+  //     return callback(null, {
+  //       statusCode: 200,
+  //       headers: {
+  //         "Access-Control-Allow-Origin": "*",
+  //         'Access-Control-Allow-Credentials': true,
+  //       }
+  //     });
+  //   }
+  // }
+
+  // dynamoDb.put(params, function (err, data) {
+  //   if (err) {
+  //     console.error("Unable to edit. Error JSON:", JSON.stringify(err, null, 2));
+  //   } else {
+  //     console.log("Edit succeeded:", JSON.stringify(data, null, 2));
+  //   }
+  // });
+};
+
 // helper functions
 const submitEmployeeP = employee => {
   console.log('Submitting employee');
@@ -115,13 +187,14 @@ const submitEmployeeP = employee => {
     .then(res => employee);
 };
 // structures name and email into JSON, and adds some timestamp metadata
-const employeeInfo = (name, email, year) => {
+const employeeInfo = (name, email, year, team) => {
   const timestamp = new Date().getTime();
   return {
     id: uuid.v1(),
     name: name,
     email: email,
     year: year,
+    team: team,
     submittedAt: timestamp,
     updatedAt: timestamp,
   };

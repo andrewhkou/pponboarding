@@ -16,6 +16,7 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:DeleteItem
+        - dynamodb:UpdateItem
       Resource: "*"
 functions:
   addEmployee:
@@ -45,14 +46,15 @@ functions:
           path: employee/{id}
           method: delete
           cors: true
-  # updateEmployee:
-  #   handler: api/employee.delete
-  #   memorySize: 128
-  #   description: Delete an employee.
-  #   events:
-  #     - http:
-  #         path: employee/{id}
-  #         method: delete
+  editEmployee:
+    handler: api/employee.edit
+    memorySize: 128
+    description: Edits employee
+    events:
+      - http:
+          path: employee/{id}
+          method: put
+          cors: true
 resources:
   Resources:
     EmployeesDynamoDbTable:

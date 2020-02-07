@@ -51,9 +51,22 @@ export default {
       }
     },
     async editEmployee(id, updatedEmployee) {
-      this.employees = this.employees.map(employee =>
-        employee.id === id ? updatedEmployee : employee
-      );
+      try {
+        this.deleteEmployee(id);
+        const response = await fetch(
+          `https://xh387a68z1.execute-api.us-east-1.amazonaws.com/dev/employee/${id}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(updatedEmployee)
+          }
+        );
+        const data = await response.json();
+        this.employees = this.employees.map(employee =>
+          employee.id === id ? data : employee
+        );
+      } catch (error) {
+        console.error(error);
+      }
     },
     async getEmployees() {
       try {
@@ -69,9 +82,12 @@ export default {
 
     async deleteEmployee(id) {
       try {
-        await fetch(`https://xh387a68z1.execute-api.us-east-1.amazonaws.com/dev/employee/${id}`, {
-          method: "DELETE"
-        });
+        await fetch(
+          `https://xh387a68z1.execute-api.us-east-1.amazonaws.com/dev/employee/${id}`,
+          {
+            method: "DELETE"
+          }
+        );
         this.employees = this.employees.filter(employee => employee.id !== id);
       } catch (error) {
         console.error(error);
